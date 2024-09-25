@@ -7,6 +7,7 @@ import java.util.List;
 import telran.net.games.entities.*;
 import telran.net.games.exceptions.*;
 import telran.net.games.model.MoveData;
+import telran.net.games.model.MoveDto;
 import telran.net.games.repo.BullsCowsRepository;
 
 public class BullsCowsServiceImpl implements BullsCowsService {
@@ -54,8 +55,7 @@ public class BullsCowsServiceImpl implements BullsCowsService {
 	 * GamerAlreadyExistsException
 	 */
 	public void registerGamer(String username, LocalDate birthDate) {
-		// TODO Auto-generated method stub
-		
+		bcRepository.createNewGamer(username, birthDate);
 	}
 	@Override
 	/**
@@ -66,7 +66,10 @@ public class BullsCowsServiceImpl implements BullsCowsService {
 	 * GamerNotFoundException
 	 */
 	public void gamerJoinGame(long gameId, String username) {
-		// TODO Auto-generated method stub
+		if(bcRepository.isGameStarted(gameId)) {
+			throw new GameAlreadyStartedException(gameId);
+		}
+		bcRepository.createGameGamer(gameId, username);
 		
 	}
 	@Override
@@ -75,8 +78,8 @@ public class BullsCowsServiceImpl implements BullsCowsService {
 	 * no exceptions (empty list is allowed)
 	 */
 	public List<Long> getNotStartedGames() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return bcRepository.getGameIdsNotStarted();
 	}
 	@Override
 	/**
@@ -91,9 +94,32 @@ public class BullsCowsServiceImpl implements BullsCowsService {
 	 * GameNotStartedException (extends IllegalStateException)
 	 * GameFinishedException (extends IllegalStateException)
 	 */
-	public List<MoveData> moveProcessing(String sequence, long gameId, String username) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<MoveData> moveProcessing(String moveSequence, long gameId, String username) {
+		if(!bcRunner.checkGuess(moveSequence)) {
+			throw new WrongMoveException(moveSequence, bcRunner.nDigits);
+		}
+		if (!bcRepository.isGameStarted(gameId)) {
+			throw new GameNotStartedException(gameId);
+		}
+		if (bcRepository.isGameFinished(gameId)) {
+			throw new GameFinishedException(gameId);
+		}
+		Game game = bcRepository.getGame(gameId);
+		String toBeGuessedSequence = game.getSequence();
+		MoveData moveData = bcRunner.moveProcessing(moveSequence,
+				toBeGuessedSequence);
+		MoveDto moveDto = new MoveDto(gameId, username, moveSequence,
+				moveData.bulls(), moveData.cows());
+		bcRepository.createGameGamerMove(moveDto);
+		if(bcRunner.checkGameFinished(moveData)) {
+			finishGame(gameId, username);
+		}
+		return bcRepository.getAllGameGamerMoves(gameId, username);
+	}
+	private void finishGame(long gameId, String username) {
+		bcRepository.setIsFinished(gameId);
+		bcRepository.setWinner(gameId, username);
+		
 	}
 	@Override
 	/**
@@ -102,8 +128,8 @@ public class BullsCowsServiceImpl implements BullsCowsService {
 	 * GameNotFoundException
 	 */
 	public boolean gameOver(long gameId) {
-		// TODO Auto-generated method stub
-		return false;
+		
+		return bcRepository.isGameFinished(gameId);
 	}
 	@Override
 	/**
@@ -112,8 +138,8 @@ public class BullsCowsServiceImpl implements BullsCowsService {
 	 * GameNotFoundException
 	 */
 	public List<String> getGameGamers(long gameId) {
-		// TODO Auto-generated method stub
-		return null;
+		bcRepository.getGame(gameId);
+		return bcRepository.getGameGamers(gameId);
 	}
 	/**
 	 * Only for testing
