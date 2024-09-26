@@ -42,6 +42,8 @@ class BullsCowsServiceTest {
 	void createGameTest() {
 		gameIdNormalFlow = bcService.createGame();
 		Game game = repository.getGame(gameIdNormalFlow);
+		assertNull(game.getDate());
+		assertFalse(game.isfinished());
 		toBeGuessedSequence = ((BullsCowsServiceImpl)bcService).getSequence(gameIdNormalFlow);
 		assertTrue(bcRunner.checkGuess(toBeGuessedSequence));
 		
@@ -106,7 +108,7 @@ class BullsCowsServiceTest {
 				bcService.moveProcessing(toBeGuessedSequence,
 						gameIdNormalFlow, username);
 		MoveData moveDataExpected = new MoveData(toBeGuessedSequence,
-				4, 0);
+				N_DIGITS, 0);
 		assertEquals(2, moves.size());
 		assertEquals(moveDataExpected, moves.get(1));
 		assertTrue(repository.isGameFinished(gameIdNormalFlow));
