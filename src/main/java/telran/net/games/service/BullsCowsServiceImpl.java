@@ -64,6 +64,7 @@ public class BullsCowsServiceImpl implements BullsCowsService {
 	 * GameNotFoundException
 	 * GameAlreadyStartedException
 	 * GamerNotFoundException
+	 * GameGamerAlreadyExists
 	 */
 	public void gamerJoinGame(long gameId, String username) {
 		if(bcRepository.isGameStarted(gameId)) {
@@ -93,19 +94,22 @@ public class BullsCowsServiceImpl implements BullsCowsService {
 	 * GamerNotFoundException
 	 * GameNotStartedException (extends IllegalStateException)
 	 * GameFinishedException (extends IllegalStateException)
+	 * GameGamerNotFounException
 	 */
 	public List<MoveData> moveProcessing(String moveSequence, long gameId, String username) {
+		
 		if(!bcRunner.checkGuess(moveSequence)) {
-			throw new WrongMoveException(moveSequence, bcRunner.nDigits);
+			throw new IncorrectMoveSequenceException(moveSequence, bcRunner.nDigits);
 		}
+		bcRepository.getGamer(username);//only for checking whether the gamer exists
 		if (!bcRepository.isGameStarted(gameId)) {
 			throw new GameNotStartedException(gameId);
 		}
 		if (bcRepository.isGameFinished(gameId)) {
 			throw new GameFinishedException(gameId);
 		}
-		Game game = bcRepository.getGame(gameId);
-		String toBeGuessedSequence = game.getSequence();
+		
+		String toBeGuessedSequence = getSequence(gameId);
 		MoveData moveData = bcRunner.moveProcessing(moveSequence,
 				toBeGuessedSequence);
 		MoveDto moveDto = new MoveDto(gameId, username, moveSequence,
@@ -142,7 +146,6 @@ public class BullsCowsServiceImpl implements BullsCowsService {
 		return bcRepository.getGameGamers(gameId);
 	}
 	/**
-	 * Only for testing
 	 * Implied that the test class resides at the same package (to access the method)
 	 * 
 	 * @param gameId
