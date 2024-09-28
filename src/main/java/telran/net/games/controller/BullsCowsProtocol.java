@@ -1,6 +1,5 @@
 package telran.net.games.controller;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +26,8 @@ public class BullsCowsProtocol implements Protocol {
 		Response response;
 		try {
 			response = switch (requestType) {
+
+			case "loginGamer" -> loginGamer(requestData);
 			case "createGame" -> createGame(requestData);
 			case "startGame" -> startGame(requestData);
 			case "registerGamer" -> registerGamer(requestData);
@@ -41,6 +42,11 @@ public class BullsCowsProtocol implements Protocol {
 			response = new Response(ResponseCode.WRONG_REQUEST_DATA, e.getMessage());
 		}
 		return response;
+	}
+
+	Response loginGamer(String requestData) {
+		String username = bcService.loginGamer(requestData);
+		return getResponseOk(username);
 	}
 
 	Response createGame(String requestData) {
