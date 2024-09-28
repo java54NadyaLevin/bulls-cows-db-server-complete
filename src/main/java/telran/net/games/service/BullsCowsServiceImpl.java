@@ -161,4 +161,16 @@ public class BullsCowsServiceImpl implements BullsCowsService {
 		 Gamer gamer = bcRepository.getGamer(username);
 		return gamer.getUsername();
 	}
+	@Override
+	public List<Long> getNotStartedGamesWithGamer(String username) {
+		return bcRepository.getNotStartedGamesWithGamer(username);
+	}
+	@Override
+	public List<Long> getNotStartedGamesWithNoGamer(String username) {
+		return bcRepository.getNotStartedGamesWithNoGamer(username);
+	}
+	@Override
+	public List<Long> getStartedGamesWithGamer(String username) {
+		return bcRepository.getStartedGamesWithGamer(username);
+	}
 }

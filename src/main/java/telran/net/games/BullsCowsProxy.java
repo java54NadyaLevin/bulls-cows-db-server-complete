@@ -72,4 +72,22 @@ public class BullsCowsProxy implements BullsCowsService {
 	
 	}
 
+	@Override
+	public List<Long> getNotStartedGamesWithGamer(String username) {
+		String strRes = tcpClient.sendAndReceive(new Request("getNotStartedGamesWithGamer", username));
+		return Arrays.stream(strRes.split(";")).map(s -> Long.valueOf(s)).toList();
+	}
+
+	@Override
+	public List<Long> getNotStartedGamesWithNoGamer(String username) {
+		String strRes = tcpClient.sendAndReceive(new Request("getNotStartedGamesWithNoGamer", username));
+		return Arrays.stream(strRes.split(";")).map(s -> Long.valueOf(s)).toList();
+	}
+
+	@Override
+	public List<Long> getStartedGamesWithGamer(String username) {
+		String strRes = tcpClient.sendAndReceive(new Request("getStartedGamesWithGamer", username));
+		return Arrays.stream(strRes.split(";")).map(s -> Long.valueOf(s)).toList();
+	}
+
 }
