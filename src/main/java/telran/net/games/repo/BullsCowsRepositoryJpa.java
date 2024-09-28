@@ -183,20 +183,20 @@ public class BullsCowsRepositoryJpa implements BullsCowsRepository {
 
 	@Override
 	public List<Long> getNotStartedGamesWithGamer(String username) {
-		TypedQuery<Long> query = em.createQuery("select game.id from GameGamer where dateTime is null and gamer.id = ?1", Long.class);
-		return query.getResultList();
+		TypedQuery<Long> query = em.createQuery("select game.id from GameGamer where game.dateTime is null and gamer.id = ?1", Long.class);
+		return query.setParameter(1, username).getResultList();
 	}
 
 	@Override
 	public List<Long> getNotStartedGamesWithNoGamer(String username) {
-		TypedQuery<Long> query = em.createQuery("select game.id from GameGamer where dateTime is null and not gamer.id = ?1", Long.class);
-		return query.getResultList();
+		TypedQuery<Long> query = em.createQuery("select distinct id from Game where dateTime is null and id not in (select game.id from GameGamer where gamer.id = ?1)", Long.class);
+		return query.setParameter(1, username).getResultList();
 	}
 
 	@Override
 	public List<Long> getStartedGamesWithGamer(String username) {
-		TypedQuery<Long> query = em.createQuery("select game.id from GameGamer where dateTime is not null and gamer.id = ?1", Long.class);
-		return query.getResultList();
+		TypedQuery<Long> query = em.createQuery("select game.id from GameGamer where not  game.isFinished and game.dateTime is not null and gamer.id = ?1", Long.class);
+		return query.setParameter(1, username).getResultList();
 	}
 
 }
