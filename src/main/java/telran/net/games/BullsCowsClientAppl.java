@@ -9,6 +9,7 @@ public class BullsCowsClientAppl {
 
 	private static final String DEFAULT_HOST = "localhost";
 	private static final int DEFAULT_PORT = 5000;
+	
 	public static void main(String[] args) {
 		
 		String hostIp = args.length > 0 ? args[0] : DEFAULT_HOST ;

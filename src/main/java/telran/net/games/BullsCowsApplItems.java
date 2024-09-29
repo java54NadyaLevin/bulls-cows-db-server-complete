@@ -9,6 +9,7 @@ import telran.net.games.service.BullsCowsService;
 import telran.view.*;
 
 public class BullsCowsApplItems {
+	private static final int N_DIGITS = 4;
 	static BullsCowsService bullsCows;
 	static long gameId;
 	static String username;
@@ -100,7 +101,7 @@ public class BullsCowsApplItems {
 			Long getGameId = io.readLong("Enter id of the game you want to join", "incorrect id");
 			if(checkGameAvailable(io, games, getGameId)) {
 				bullsCows.gamerJoinGame(gameId, username);
-				io.writeLine("you've joined to game with id " + gameId);
+				io.writeLine("You've joined to game with id " + gameId);
 			};
 		} catch (Exception e) {
 			io.writeLine("No games available");
@@ -115,12 +116,12 @@ public class BullsCowsApplItems {
 	}
 
 	static void makeMove(InputOutput io) {
-		String guess = io.readStringPredicate("enter non-repeated digits", "Wrong input",
-				str -> str.chars().distinct().filter(c -> c >= '0' && c <= '9').count() == 4);
+		String guess = io.readStringPredicate("Enter "+ N_DIGITS + " non-repeated digits", "Wrong input",
+				str -> str.chars().distinct().filter(c -> c >= '0' && c <= '9').count() == N_DIGITS);
 		List<MoveData> moves = bullsCows.moveProcessing(guess, gameId, username);
 		moves.forEach(io::writeLine);
 		if (bullsCows.gameOver(gameId)) {
-			io.writeLine("Congratulations: you are winner");
+			io.writeLine("Congratulations: you are winner!!!");
 			enterGame(io);
 		}
 
